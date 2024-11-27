@@ -1,0 +1,52 @@
+@base_url = http://localhost:5181
+
+# FUNCIONÁRIO ######################################
+
+### Criação de um novo funcionário
+POST http://localhost:5181/Gerenciador/funcionario/cadastrar
+Content-Type: application/json
+
+{
+    "nome": "Jhon",
+    "cpf" : "09817057908"
+}
+
+### Obtenção de todos os funcionários
+GET http://localhost:5181/Gerenciador/funcionario/listar
+
+
+# TAREFA ############################################
+
+### Criação de uma nova tarefa
+POST http://localhost:5181/Gerenciador/tarefa/cadastrar
+Content-Type: application/json
+
+{
+    "descricao": "Ir no mercado comprar macarrao",
+    "dataConclusao": "2024-12-01T00:00:00",
+    "concluida": false,
+    "funcionarioId": 3
+}
+
+### Obtenção de todas as tarefas
+GET http://localhost:5181/Gerenciador/tarefa/listar
+
+### Obtenção de tarefas por funcionário (usando o ID do funcionário)
+GET http://localhost:5181/Gerenciador/tarefa/buscar/2
+
+### Edição de uma tarefa existente
+PUT http://localhost:5181/Gerenciador/tarefa/editar/1
+Content-Type: application/json
+
+{
+    "descricao": "Atualizar documentação do projeto",
+    "dataConclusao": "2024-12-05T00:00:00",
+    "concluida": true
+}
+
+### Exclusão de uma tarefa
+DELETE http://localhost:5181/Gerenciador/tarefa/deletar/
+
+
+###Demisão  de um funcionário
+DELETE http://localhost:5181/Gerenciador/funcionario/deletar/
