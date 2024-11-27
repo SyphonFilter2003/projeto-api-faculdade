@@ -1,15 +1,13 @@
-# Documentação para rodar o projeto
+# Documentação para rodar o projeto front-end
 
-Para baixar o repositório:
+1. Tenha certeza de que o terminal esteja apontado para a pasta `frontend`
 
-```git clone https://github.com/SyphonFilter2003/projeto-api-faculdade.git``` 
+```cd frontend```
 
+2. Instale as dependências necessárias com o comando 
 
-## Documentação para o front-end
+```npm install```
 
-Clique [aqui](https://github.com/SyphonFilter2003/projeto-api-faculdade/blob/dev/frontend/README.md) para ler a documentação do front-end
+3. Assim que terminar de instalar as dependências, rode o projeto com
 
-
-## Documentação para o backend
-
-Clique [aqui](https://github.com/SyphonFilter2003/projeto-api-faculdade/blob/dev/backend/README.md) para ler a documentação do back-end
+```npm start```
