@@ -116,5 +116,59 @@ app.MapDelete("/Gerenciador/tarefa/deletar/{id}", async ([FromRoute] int id, App
     return Results.Ok("Tarefa deletada com sucesso.");
 });
 
+//Cadastro de um novo projeto
+app.MapPost("/Gerenciador/projeto/cadastrar", async ([FromBody] Projeto projeto, AppDataContext ctx) => {
+    projeto.DataInicio = DateTime.Now;
+    ctx.Add(projeto);
+    await ctx.SaveChangesAsync();
+    return Results.Created("", projeto);
+});
+
+//Obtenção de todos os projetos
+app.MapGet("/Gerenciador/projeto/listar", (AppDataContext ctx) => {
+    var projetos = ctx.Projetos.Include(p => p.Tarefas).ToList();
+    if (projetos.Any())
+        return Results.Ok(projetos);
+
+    return Results.NotFound("Nenhum projeto encontrado.");
+});
+
+//Associar uma tarefa a um projeto
+app.MapPut("/Gerenciador/projeto/adicionar-tarefa/{projetoId}/{tarefaId}", async (int projetoId, int tarefaId, AppDataContext ctx) => {
+    var projeto = await ctx.Projetos.Include(p => p.Tarefas).FirstOrDefaultAsync(p => p.Id == projetoId);
+    var tarefa = await ctx.Tarefas.FindAsync(tarefaId);
+
+    if (projeto == null || tarefa == null)
+        return Results.NotFound("Projeto ou Tarefa não encontrados.");
+
+    projeto.Tarefas ??= new List<Tarefa>();
+    projeto.Tarefas.Add(tarefa);
+    ctx.Update(projeto);
+    await ctx.SaveChangesAsync();
+
+    return Results.Ok(projeto);
+});
+
+//Geração de relatório de tarefas para um funcionário
+app.MapPost("/Gerenciador/relatorio/funcionario/{funcionarioId}", async (int funcionarioId, AppDataContext ctx) => {
+    var funcionario = await ctx.Funcionarios.FindAsync(funcionarioId);
+    if (funcionario == null)
+        return Results.NotFound("Funcionário não encontrado.");
+
+    var tarefas = ctx.Tarefas.Where(t => t.FuncionarioId == funcionarioId).ToList();
+    var relatorio = new Relatorio
+    {
+        Descricao = $"Relatório de tarefas do funcionário {funcionario.Nome}",
+        DataGeracao = DateTime.Now,
+        FuncionarioId = funcionarioId,
+        Funcionario = funcionario
+    };
+
+    ctx.Add(relatorio);
+    await ctx.SaveChangesAsync();
+
+    return Results.Ok(new { relatorio, tarefas });
+});
+
 
 app.Run();
