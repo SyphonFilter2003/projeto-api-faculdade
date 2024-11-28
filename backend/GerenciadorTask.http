@@ -50,3 +50,23 @@ DELETE http://localhost:5181/Gerenciador/tarefa/deletar/
 
 ###Demisão  de um funcionário
 DELETE http://localhost:5181/Gerenciador/funcionario/deletar/
+
+###Cadastro de um novo projeto
+POST http://localhost:5181/Gerenciador/projeto/cadastrar
+Content-Type: application/json
+
+{
+    "nome": "Projeto Alpha",
+    "descricao": "Desenvolver o módulo de autenticação",
+    "dataFim": "2024-12-31T00:00:00",
+    "concluido": false
+}
+
+###Obtenção de todos os projetos
+GET http://localhost:5181/Gerenciador/projeto/listar
+
+###Associar uma tarefa a um projeto
+PUT http://localhost:5181/Gerenciador/projeto/adicionar-tarefa/1/3
+
+###Geração de relatório de tarefas para um funcionário
+POST http://localhost:5181/Gerenciador/relatorio/funcionario/3
