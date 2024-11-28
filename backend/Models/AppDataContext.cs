@@ -6,6 +6,9 @@ namespace Gerenciador.Models
     {
         public DbSet<Funcionario> Funcionarios { get; set; }
         public DbSet<Tarefa> Tarefas { get; set; }
+        public DbSet<Projeto> Projetos { get; set; }
+        public DbSet<Relatorio> Relatorios { get; set; }
+
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
