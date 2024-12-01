@@ -1,18 +1,28 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './App.css'; 
+
 // URL base da API
 const API_URL = 'http://localhost:5181/Gerenciador';
 
 function App() {
   const [funcionarios, setFuncionarios] = useState([]);
   const [tarefas, setTarefas] = useState([]);
+  const [projetos, setProjetos] = useState([]);
+  const [relatorios, setRelatorios] = useState([]);
+
   const [newFuncionario, setNewFuncionario] = useState('');
   const [newFuncionarioCpf, setNewFuncionarioCpf] = useState('');
   const [newTarefa, setNewTarefa] = useState('');
   const [funcionarioId, setFuncionarioId] = useState('');
+  const [newProjetoNome, setNewProjetoNome] = useState('');
+  const [newProjetoDescricao, setNewProjetoDescricao] = useState('');
+  const [newProjetoDataInicio, setNewProjetoDataInicio] = useState('');
+  const [newProjetoDataFim, setNewProjetoDataFim] = useState('');
+  const [newProjetoConcluido, setNewProjetoConcluido] = useState(false);
+  const [newRelatorioDescricao, setNewRelatorioDescricao] = useState('');
+  const [funcionarioIdRelatorio, setFuncionarioIdRelatorio] = useState('');
 
-  // Função para listar funcionários
   const fetchFuncionarios = async () => {
     try {
       const response = await axios.get(`${API_URL}/funcionario/listar`);
@@ -22,7 +32,6 @@ function App() {
     }
   };
 
-  // Função para listar tarefas
   const fetchTarefas = async () => {
     try {
       const response = await axios.get(`${API_URL}/tarefa/listar`);
@@ -32,7 +41,24 @@ function App() {
     }
   };
 
-  // Função para cadastrar funcionário
+  const fetchProjetos = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/projeto/listar`);
+      setProjetos(response.data);
+    } catch (error) {
+      console.error('Erro ao buscar projetos', error);
+    }
+  };
+
+  const fetchRelatorios = async () => {
+    try {
+      const response = await axios.get(`${API_URL}/relatorio/listar`);
+      setRelatorios(response.data);
+    } catch (error) {
+      console.error('Erro ao buscar relatórios', error);
+    }
+  };
+
   const addFuncionario = async () => {
     if (!newFuncionario) return;
 
@@ -47,7 +73,6 @@ function App() {
     }
   };
 
-  // Função para cadastrar tarefa
   const addTarefa = async () => {
     if (!newTarefa || !funcionarioId) return;
 
@@ -62,7 +87,43 @@ function App() {
     }
   };
 
-  // Função para deletar tarefa
+  const addProjeto = async () => {
+    if (!newProjetoNome || !newProjetoDescricao || !newProjetoDataInicio) return;
+
+    const projeto = {
+      nome: newProjetoNome,
+      descricao: newProjetoDescricao,
+      dataInicio: newProjetoDataInicio,
+      dataFim: newProjetoDataFim,
+      concluido: newProjetoConcluido,
+    };
+    try {
+      await axios.post(`${API_URL}/projeto/cadastrar`, projeto);
+      setNewProjetoNome('');
+      setNewProjetoDescricao('');
+      setNewProjetoDataInicio('');
+      setNewProjetoDataFim('');
+      setNewProjetoConcluido(false);
+      fetchProjetos();
+    } catch (error) {
+      console.error('Erro ao cadastrar projeto', error);
+    }
+  };
+
+  const addRelatorio = async () => {
+    if (!newRelatorioDescricao || !funcionarioIdRelatorio) return;
+
+    const relatorio = { descricao: newRelatorioDescricao, funcionarioId: parseInt(funcionarioIdRelatorio) };
+    try {
+      await axios.post(`${API_URL}/relatorio/funcionario/${funcionarioIdRelatorio}`, relatorio);
+      setNewRelatorioDescricao('');
+      setFuncionarioIdRelatorio('');
+      fetchRelatorios();
+    } catch (error) {
+      console.error('Erro ao cadastrar relatório', error);
+    }
+  };
+
   const deleteTarefa = async (id) => {
     try {
       await axios.delete(`${API_URL}/tarefa/deletar/${id}`);
@@ -72,7 +133,6 @@ function App() {
     }
   };
 
-  // Função para deletar funcionário
   const deleteFuncionario = async (id) => {
     try {
       await axios.delete(`${API_URL}/funcionario/deletar/${id}`);
@@ -82,15 +142,34 @@ function App() {
     }
   };
 
-  // Carregar dados ao montar o componente
+  const deleteProjeto = async (id) => {
+    try {
+      await axios.delete(`${API_URL}/projeto/deletar/${id}`);
+      fetchProjetos();
+    } catch (error) {
+      console.error('Erro ao deletar projeto', error);
+    }
+  };
+
+  const deleteRelatorio = async (id) => {
+    try {
+      await axios.delete(`${API_URL}/relatorio/deletar/${id}`);
+      fetchRelatorios();
+    } catch (error) {
+      console.error('Erro ao deletar relatório', error);
+    }
+  };
+
   useEffect(() => {
     fetchFuncionarios();
     fetchTarefas();
+    fetchProjetos();
+    fetchRelatorios();
   }, []);
 
   return (
     <div className="App">
-      <h1>Gerenciador de Funcionários e Tarefas</h1>
+      <h1>Gerenciador de Funcionários, Tarefas, Projetos e Relatórios</h1>
 
       <div>
         <h2>Cadastrar Funcionário</h2>
@@ -145,6 +224,92 @@ function App() {
             <li key={tarefa.id}>
               {tarefa.descricao} - {tarefa.funcionario?.nome}
               <button onClick={() => deleteTarefa(tarefa.id)}>Deletar</button>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <h2>Cadastrar Projeto</h2>
+        <input
+          type="text"
+          value={newProjetoNome}
+          onChange={(e) => setNewProjetoNome(e.target.value)}
+          placeholder="Nome do Projeto"
+        />
+        <input
+          type="text"
+          value={newProjetoDescricao}
+          onChange={(e) => setNewProjetoDescricao(e.target.value)}
+          placeholder="Descrição do Projeto"
+        />
+        <input
+          type="date"
+          value={newProjetoDataInicio}
+          onChange={(e) => setNewProjetoDataInicio(e.target.value)}
+        />
+        <input
+          type="date"
+          value={newProjetoDataFim}
+          onChange={(e) => setNewProjetoDataFim(e.target.value)}
+        />
+        <label>
+          Concluído:
+          <input
+            type="checkbox"
+            checked={newProjetoConcluido}
+            onChange={(e) => setNewProjetoConcluido(e.target.checked)}
+          />
+        </label>
+        <button onClick={addProjeto}>Cadastrar Projeto</button>
+      </div>
+
+      <div>
+        <h2>Lista de Projetos</h2>
+        <ul>
+          {projetos.map((projeto) => (
+            <li key={projeto.id}>
+              <h3>{projeto.nome}</h3>
+              <p>{projeto.descricao}</p>
+              <p>Data Início: {projeto.dataInicio}</p>
+              <p>Data Fim: {projeto.dataFim ? projeto.dataFim : 'Em andamento'}</p>
+              <p>Status: {projeto.concluido ? 'Concluído' : 'Em andamento'}</p>
+              <button onClick={() => deleteProjeto(projeto.id)}>Deletar</button>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div>
+        <h2>Cadastrar Relatório</h2>
+        <input
+          type="text"
+          value={newRelatorioDescricao}
+          onChange={(e) => setNewRelatorioDescricao(e.target.value)}
+          placeholder="Descrição do Relatório"
+        />
+        <select
+          value={funcionarioIdRelatorio}
+          onChange={(e) => setFuncionarioIdRelatorio(e.target.value)}
+        >
+          <option value="">Selecione o Funcionário</option>
+          {funcionarios.map((funcionario) => (
+            <option key={funcionario.id} value={funcionario.id}>
+              {funcionario.nome}
+            </option>
+          ))}
+        </select>
+        <button onClick={addRelatorio}>Cadastrar Relatório</button>
+      </div>
+
+      <div>
+        <h2>Lista de Relatórios</h2>
+        <ul>
+          {relatorios.map((relatorio) => (
+            <li key={relatorio.id}>
+              <h3>{relatorio.descricao}</h3>
+              <p>Funcionário: {relatorio.funcionario?.nome}</p>
+              <button onClick={() => deleteRelatorio(relatorio.id)}>Deletar</button>
             </li>
           ))}
         </ul>
