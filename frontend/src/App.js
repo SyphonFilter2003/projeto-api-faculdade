@@ -321,18 +321,6 @@ function App() {
         <button onClick={addRelatorio}>Cadastrar Relatório</button>
       </div>
 
-      <div>
-        <h2>Lista de Relatórios</h2>
-        <ul>
-          {relatorios.map((relatorio) => (
-            <li key={relatorio.id}>
-              <h3>{relatorio.descricao}</h3>
-              <p>Funcionário: {relatorio.funcionario?.nome}</p>
-              <button onClick={() => deleteRelatorio(relatorio.id)}>Deletar</button>
-            </li>
-          ))}
-        </ul>
-      </div>
     </div>
   
       <div>
