@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import './App.css'; 
+import './App.css';
 
 // URL base da API
 const API_URL = 'http://localhost:5181/Gerenciador';
@@ -22,6 +22,9 @@ function App() {
   const [newProjetoConcluido, setNewProjetoConcluido] = useState(false);
   const [newRelatorioDescricao, setNewRelatorioDescricao] = useState('');
   const [funcionarioIdRelatorio, setFuncionarioIdRelatorio] = useState('');
+
+  const [projetoId, setProjetoId] = useState('');
+  const [tarefaId, setTarefaId] = useState('');
 
   const fetchFuncionarios = async () => {
     try {
@@ -124,6 +127,19 @@ function App() {
     }
   };
 
+  const addTarefaAoProjeto = async () => {
+    if (!projetoId || !tarefaId) return;
+
+    try {
+      await axios.put(`${API_URL}/projeto/adicionar-tarefa/${projetoId}/${tarefaId}`);
+      alert('Tarefa adicionada ao projeto com sucesso!');
+      fetchProjetos(); // Atualiza a lista de projetos
+    } catch (error) {
+      console.error('Erro ao adicionar tarefa ao projeto', error);
+      alert('Erro ao adicionar tarefa ao projeto');
+    }
+  };
+
   const deleteTarefa = async (id) => {
     try {
       await axios.delete(`${API_URL}/tarefa/deletar/${id}`);
@@ -169,6 +185,9 @@ function App() {
 
   return (
     <div className="App">
+      <h1>Gerenciador de Funcionários, Tarefas, Projetos e Relatórios</h1>
+
+      <div className="App">
       <h1>Gerenciador de Funcionários, Tarefas, Projetos e Relatórios</h1>
 
       <div>
@@ -313,6 +332,28 @@ function App() {
             </li>
           ))}
         </ul>
+      </div>
+    </div>
+  
+      <div>
+        <h2>Adicionar Tarefa ao Projeto</h2>
+        <select value={projetoId} onChange={(e) => setProjetoId(e.target.value)}>
+          <option value="">Selecione um Projeto</option>
+          {projetos.map((projeto) => (
+            <option key={projeto.id} value={projeto.id}>
+              {projeto.nome}
+            </option>
+          ))}
+        </select>
+        <select value={tarefaId} onChange={(e) => setTarefaId(e.target.value)}>
+          <option value="">Selecione uma Tarefa</option>
+          {tarefas.map((tarefa) => (
+            <option key={tarefa.id} value={tarefa.id}>
+              {tarefa.descricao}
+            </option>
+          ))}
+        </select>
+        <button onClick={addTarefaAoProjeto}>Adicionar Tarefa ao Projeto</button>
       </div>
     </div>
   );
